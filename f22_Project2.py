@@ -1,3 +1,8 @@
+# Your name: Amelia Nam
+# Your student id: 83154184
+# Your email: melnam@umich.edu
+# List who you have worked with on this homework:
+
 from xml.sax import parseString
 from bs4 import BeautifulSoup
 import re
@@ -25,8 +30,34 @@ def get_listings_from_search_results(html_file):
         ('Loft in Mission District', 210, '1944564'),  # example
     ]
     """
-    pass
+    listing_title_list = []
+    cost_list = []
+    listing_id = []
+    listing_id_list = []
+ 
+    base_path = os.path.abspath(os.path.dirname(__file__))
+    fullpath = os.path.join(base_path, html_file)
+    file = open(fullpath, 'r')
+    f = file.read()
+    file.close()
+    soup = BeautifulSoup(f, 'html.parser')
 
+    listing_title = soup.find_all('div', class_ = 't1jojoys dir dir-ltr')
+    for ti in listing_title:
+        listing_title_list.append(ti.text)
+
+    cost = soup.find_all('span', class_= '_tyxjp1')
+    for co in cost:
+        cost_list.append(int(co.text.strip('$')))
+    #strip the $ and make it an int
+
+    for listing in listing_title:
+        listing_id.append(listing.get('id')[6:])
+
+    for x in range(len(cost_list)):
+        listing_id_list.append((listing_title_list[x], cost_list[x], listing_id[x]))
+   
+    return listing_id_list
 
 def get_listing_information(listing_id):
     """
@@ -52,6 +83,15 @@ def get_listing_information(listing_id):
         number of bedrooms
     )
     """
+    base_path = os.path.abspath(os.path.dirname(__file__))
+    fullpath = os.path.join(base_path, 'html_files/' + listing_id.html)
+    file = open(fullpath, 'r')
+    f = file.read()
+    file.close()
+    soup = BeautifulSoup(f, 'html.parser')
+
+
+
     pass
 
 
@@ -147,11 +187,12 @@ class TestCases(unittest.TestCase):
         # check that the variable you saved after calling the function is a list
         self.assertEqual(type(listings), list)
         # check that each item in the list is a tuple
-
+        self.assertEqual(type(listings[0]), tuple)
         # check that the first title, cost, and listing id tuple is correct (open the search results html and find it)
-
+        self.assertEqual(listings[0], ('Loft in Mission District', 210, '1944564'))
         # check that the last title is correct (open the search results html and find it)
-        pass
+        self.assertEqual(listings[19], ('Guest suite in Mission District', 238, '32871760'))
+    
 
     def test_get_listing_information(self):
         html_list = ["1623609",
