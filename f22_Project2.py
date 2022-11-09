@@ -1,7 +1,7 @@
 # Your name: Amelia Nam
 # Your student id: 83154184
 # Your email: melnam@umich.edu
-# List who you have worked with on this homework:
+# List who you have worked with on this homework: Lena Bibbo & Charlotte Foley
 
 from xml.sax import parseString
 from bs4 import BeautifulSoup
@@ -49,15 +49,17 @@ def get_listings_from_search_results(html_file):
     cost = soup.find_all('span', class_= '_tyxjp1')
     for co in cost:
         cost_list.append(int(co.text.strip('$')))
-    #strip the $ and make it an int
+    #remove the $ and make it an int
 
     for listing in listing_title:
         listing_id.append(listing.get('id')[6:])
-
+        #get rid of the weird _title
+       
     for x in range(len(cost_list)):
         listing_id_list.append((listing_title_list[x], cost_list[x], listing_id[x]))
    
     return listing_id_list
+
 
 def get_listing_information(listing_id):
     """
@@ -84,15 +86,53 @@ def get_listing_information(listing_id):
     )
     """
     base_path = os.path.abspath(os.path.dirname(__file__))
-    fullpath = os.path.join(base_path, 'html_files/' + listing_id.html)
+    fullpath = os.path.join(base_path, f'html_files/listing_{listing_id}.html')
     file = open(fullpath, 'r')
     f = file.read()
     file.close()
+
+    # read_listing = 'listing_' + listing_id + '.html'
+    # with open(read_listing) as f:
+    #     contents = f.read()
     soup = BeautifulSoup(f, 'html.parser')
+ 
+    policy_list = []
+    type_list = []
+    bedroom_list = []
+    get_list = []
 
+    #going to have to do regex here fml 
+    #regex = 
+    # policy_number = soup.find_all('li', class_='f19phm7j dir dir-ltr')
+    # for policy in policy_number:
+    #     policy_list.append(policy.text)
+    policy_number = soup.find_all('li', class_='f19phm7j dir dir-ltr')
+    for policy in policy_number:
+        span_tag = policy.find('span')
+        policy_list.append(span_tag.text)
+        # policy_list.append(policy.get('span'))
+    #print(policy_list[0])--> NEED TO MAKE SURE THAT WE RETURN THE POLICY LIST AT ZERO OUTSIDE OF THE LOOP AFTERWARDS
+    
 
+    type_place = soup.find_all('h2', class_ = '_14i3z6h')
+    for place in type_place:
+        type_list.append(place.text)
+    #print(type_list)
 
-    pass
+    #i think that i would have to do regex here or something like that
+
+    bedroom = soup.find_all('span', class_ = 's1b4clln dir dir-ltr')
+    for bed in bedroom:  
+        bedroom_list.append(bed.text)
+        # this needs to be an integer
+    print(bedroom_list)
+
+    for beds in bedroom_list:
+        get_list.append(f'html_files/{listing_id}.html' + beds )
+    
+    # print(get_list)
+    return get_list
+
 
 
 def get_detailed_listing_database(html_file):
@@ -109,6 +149,7 @@ def get_detailed_listing_database(html_file):
         ...
     ]
     """
+
     pass
 
 
@@ -134,6 +175,11 @@ def write_csv(data, filename):
 
     This function should not return anything.
     """
+    # with open(filename, 'w') as f:
+    #     f.write('Listing Title,Cost,Listing ID,Policy Number,Place Type,Number of Bedrooms\n')
+    #     data.sort(key=lambda x:x[2])
+    #     for index in range(len(data)):
+    #         f.write(f'{data[index][0]},{str(data[index][1])},{str(data[index][2])},{str(data[index][3])},{str(data[index][4])}, {str(data[index][5])}' + '\n')
     pass
 
 
@@ -188,10 +234,14 @@ class TestCases(unittest.TestCase):
         self.assertEqual(type(listings), list)
         # check that each item in the list is a tuple
         self.assertEqual(type(listings[0]), tuple)
+        self.assertEqual(type(listings[1]), tuple)
+        self.assertEqual(type(listings[2]), tuple)
+        for listing in listings:
+            self.assertEqual(type(listing), tuple)
         # check that the first title, cost, and listing id tuple is correct (open the search results html and find it)
         self.assertEqual(listings[0], ('Loft in Mission District', 210, '1944564'))
         # check that the last title is correct (open the search results html and find it)
-        self.assertEqual(listings[19], ('Guest suite in Mission District', 238, '32871760'))
+        self.assertEqual(listings[19][0], ('Guest suite in Mission District'))
     
 
     def test_get_listing_information(self):
