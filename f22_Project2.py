@@ -60,7 +60,6 @@ def get_listings_from_search_results(html_file):
    
     return listing_id_list
 
-
 def get_listing_information(listing_id):
     """
     Write a function to return relevant information in a tuple from an Airbnb listing id.
@@ -91,49 +90,40 @@ def get_listing_information(listing_id):
     f = file.read()
     file.close()
 
-    # read_listing = 'listing_' + listing_id + '.html'
-    # with open(read_listing) as f:
-    #     contents = f.read()
     soup = BeautifulSoup(f, 'html.parser')
- 
-    policy_list = []
-    type_list = []
-    bedroom_list = []
-    get_list = []
 
-    #going to have to do regex here fml 
-    #regex = 
-    # policy_number = soup.find_all('li', class_='f19phm7j dir dir-ltr')
-    # for policy in policy_number:
-    #     policy_list.append(policy.text)
-    policy_number = soup.find_all('li', class_='f19phm7j dir dir-ltr')
-    for policy in policy_number:
-        span_tag = policy.find('span')
-        policy_list.append(span_tag.text)
-        # policy_list.append(policy.get('span'))
-    #print(policy_list[0])--> NEED TO MAKE SURE THAT WE RETURN THE POLICY LIST AT ZERO OUTSIDE OF THE LOOP AFTERWARDS
+    policy_numbers = soup.find('ul', class_='fhhmddr dir dir-ltr')
+    policy_numbers = policy_numbers.find_all('span')[0]
+    for policy in policy_numbers: 
+        policy_num = policy.text
+        if 'pending' in policy_num.lower():
+            policy_num = 'Pending'
+        elif 'exempt' in policy_num.lower():
+            policy_num = 'Exempt'
+
+    type_place = soup.find('h2', class_ = '_14i3z6h')
+    place1 = type_place.text
+    words_list = place1.split()
+    if words_list[0].lower() == "private":
+        place_type = 'Private Room'
+    elif words_list[0].lower() == 'shared':
+        place_type = 'Shared Room'
+    else:
+        place_type = "Entire Room"
+
+    bedroom = soup.find('ol', class_ = 'lgx66tx dir dir-ltr')
+    bedroom = bedroom.find_all('span')[5]
+    for bed in bedroom:
+        bed_str = bed.text
+        if bed_str.lower() == 'studio':
+            bedroom_num = 1
+        else:
+            bed_str.split()
+            bedroom_num = int(bed_str[0])
     
+    tup = (policy_num, place_type, bedroom_num)
 
-    type_place = soup.find_all('h2', class_ = '_14i3z6h')
-    for place in type_place:
-        type_list.append(place.text)
-    #print(type_list)
-
-    #i think that i would have to do regex here or something like that
-
-    bedroom = soup.find_all('span', class_ = 's1b4clln dir dir-ltr')
-    for bed in bedroom:  
-        bedroom_list.append(bed.text)
-        # this needs to be an integer
-    print(bedroom_list)
-
-    for beds in bedroom_list:
-        get_list.append(f'html_files/{listing_id}.html' + beds )
-    
-    # print(get_list)
-    return get_list
-
-
+    return tup
 
 def get_detailed_listing_database(html_file):
     """
@@ -180,6 +170,7 @@ def write_csv(data, filename):
     #     data.sort(key=lambda x:x[2])
     #     for index in range(len(data)):
     #         f.write(f'{data[index][0]},{str(data[index][1])},{str(data[index][2])},{str(data[index][3])},{str(data[index][4])}, {str(data[index][5])}' + '\n')
+   
     pass
 
 
