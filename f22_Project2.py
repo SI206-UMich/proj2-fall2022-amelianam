@@ -139,9 +139,16 @@ def get_detailed_listing_database(html_file):
         ...
     ]
     """
+    listing_database_list = []
+    tup = ()
+    listing_id_list = get_listings_from_search_results(html_file)
 
-    pass
+    for listing_id in listing_id_list:
+        listing_info = get_listing_information(listing_id[2])
+        tup = listing_id + listing_info
+        listing_database_list.append(tup)
 
+    return listing_database_list
 
 def write_csv(data, filename):
     """
@@ -165,14 +172,11 @@ def write_csv(data, filename):
 
     This function should not return anything.
     """
-    # with open(filename, 'w') as f:
-    #     f.write('Listing Title,Cost,Listing ID,Policy Number,Place Type,Number of Bedrooms\n')
-    #     data.sort(key=lambda x:x[2])
-    #     for index in range(len(data)):
-    #         f.write(f'{data[index][0]},{str(data[index][1])},{str(data[index][2])},{str(data[index][3])},{str(data[index][4])}, {str(data[index][5])}' + '\n')
-   
-    pass
-
+    with open(filename, 'w') as f:
+        f.write('Listing Title,Cost,Listing ID,Policy Number,Place Type,Number of Bedrooms\n')
+        data.sort(key=lambda x:x[2])
+        for index in range(len(data)):
+            f.write(f'{data[index][0]},{str(data[index][1])},{str(data[index][2])},{str(data[index][3])},{str(data[index][4])}, {str(data[index][5])}' + '\n')
 
 def check_policy_numbers(data):
     """
@@ -193,8 +197,17 @@ def check_policy_numbers(data):
     ]
 
     """
-    pass
+    id_list = []
 
+    for tup in data:
+        policy_num = tup[3]
+        listing_id = tup[2]
+        reg = r'20[0-9]{2}-00[0-9]{4}STR'
+        reg2 = r'STR-000[0-9]{4}'
+        if policy_num == reg or policy_num == reg2:
+            id_list.append(listing_id)
+    
+    return id_list
 
 def extra_credit(listing_id):
     """
