@@ -173,7 +173,6 @@ def write_csv(data, filename):
 
     This function should not return anything.
     """
-    
     with open(filename, 'w', newline = '') as f:
         f.write('Listing Title,Cost,Listing ID,Policy Number,Place Type,Number of Bedrooms\n')
         data_s = sorted(data, key=lambda x:x[1])
@@ -239,10 +238,7 @@ def extra_credit(listing_id):
     for num in dates_dict.values():
         if num > 90:
             return False
-        else:
-            return True
-
-
+    return True
 
 class TestCases(unittest.TestCase):
     def test_get_listings_from_search_results(self):
